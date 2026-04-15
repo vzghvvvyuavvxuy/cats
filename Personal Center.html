@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猫猫购物商城 - 个人中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #e86850;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-display {
+            color: #666;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn {
+            background-color: #e86850;
+            color: #fff;
+        }
+
+        .login-btn:hover {
+            background-color: #d45840;
+        }
+
+        .logout-btn {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .logout-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .back-home {
+            text-decoration: none;
+            color: #e86850;
+            font-size: 14px;
+        }
+
+        .back-home:hover {
+            color: #d45840;
+            text-decoration: underline;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background-color: #fff;
+            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #999;
+            flex: 1;
+            text-align: center;
+        }
+
+        .modal-tab.active {
+            color: #e86850;
+            border-bottom: 2px solid #e86850;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #e86850;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .modal-form button {
+            width: 100%;
+            background-color: #e86850;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .modal-form button:hover {
+            background-color: #d45840;
+        }
+
+        .modal-form {
+            display: none;
+        }
+
+        .modal-form.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .profile-main {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .unlogin-tip {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .user-card {
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .user-avatar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 2px solid #f5f5f5;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .user-tag {
+            font-size: 12px;
+            color: #e86850;
+            background-color: #fff0ee;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 5px;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #666;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a.active,
+        .nav-menu a:hover {
+            background-color: #fff0ee;
+            color: #e86850;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: none;
+        }
+
+        .content-tip {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 80px 20px;
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .goods-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .goods-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .goods-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .goods-img {
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .goods-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .goods-info {
+            padding: 15px;
+        }
+
+        .goods-name {
+            font-size: 14px;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .goods-price {
+            color: #e86850;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .add-cart-btn {
+            width: 100%;
+            background-color: #fff;
+            color: #e86850;
+            border: 1px solid #e86850;
+        }
+
+        .add-cart-btn:hover {
+            background-color: #e86850;
+            color: #fff;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .num-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            line-height: 1;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        .empty-cart {
+            color: #999;
+            padding: 40px 0;
+        }
+
+        .total-price {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
+            color: #e86850;
+        }
+
+        @media (max-width: 768px) {
+            .profile-main {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .modal {
+                width: 90%;
+            }
+
+            .goods-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="./img/favicon.ico" alt="logo">猫猫购物商城 - 个人中心
+            </div>
+            <div class="header-actions">
+                <span class="user-display" id="userDisplay"></span>
+                <button class="logout-btn" id="logoutBtn" style="display: none;">退出登录</button>
+                <button class="login-btn" id="loginBtn">登录/注册</button>
+                <a href="Home page.html" class="back-home">返回首页</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div class="modal-tabs">
+                <div class="modal-tab active" data-tab="login">登录</div>
+                <div class="modal-tab" data-tab="register">注册</div>
+            </div>
+
+            <!-- 登录表单 -->
+            <form class="modal-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">用户名</label>
+                    <input type="text" id="loginUsername" required>
+                    <div class="error-message" id="loginUsernameError">请输入用户名</div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" required>
+                    <div class="error-message" id="loginPasswordError">请输入密码</div>
+                </div>
+                <button type="submit">登录</button>
+            </form>
+
+            <!-- 注册表单 -->
+            <form class="modal-form" id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">用户名</label>
+                    <input type="text" id="regUsername" required>
+                    <div class="error-message" id="regUsernameError">请输入用户名（3-10位）</div>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">密码</label>
+                    <input type="password" id="regPassword" required>
+                    <div class="error-message" id="regPasswordError">请输入密码（至少6位）</div>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">确认密码</label>
+                    <input type="password" id="regConfirmPassword" required>
+                    <div class="error-message" id="regConfirmError">两次密码不一致</div>
+                </div>
+                <button type="submit">注册</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="profile-main">
+            <aside class="sidebar">
+                <div class="unlogin-tip" id="unloginTip">请先登录，解锁更多功能~</div>
+                <div class="user-card" id="userCard">
+                    <div class="user-avatar">
+                        <img src="./img/个人中心.jpg" alt="头像">
+                    </div>
+                    <div class="user-name" id="sidebarUsername"></div>
+                    <div class="user-tag">喵星VIP会员</div>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#" class="active" id="goodsPageLink">商品页</a></li>
+                    <li><a href="#" id="cartPageLink">我的购物车</a></li>
+                    <li><a href="#" id="orderPageLink">我的订单</a></li>
+                    <li><a href="#" id="refundPageLink">退货/退款</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content" id="mainContent">
+                <div id="goodsModule">
+                    <h2 class="section-title">猫猫用品专区</h2>
+                    <div id="goods-container" class="goods-list"></div>
+                </div>
+
+                <div id="cartApp" style="display: none;">
+                    <h2 class="section-title">我的购物车</h2>
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>商品名称</th>
+                                <th>价格</th>
+                                <th>数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in cartItems" :key="item.id">
+                                <td>{{index+1}}</td>
+                                <td>{{item.name}}</td>
+                                <td>¥{{item.price}}</td>
+                                <td>
+                                    <button class="num-btn" @click="updateCount(item.id, item.count-1)">-</button>
+                                    <span>{{item.count}}</span>
+                                    <button class="num-btn" @click="updateCount(item.id, item.count+1)">+</button>
+                                </td>
+                                <td><button class="remove-btn" @click="deleteItem(item.id)">删除</button></td>
+                            </tr>
+                            <tr v-if="cartItems.length===0">
+                                <td colspan="5" class="empty-cart">购物车为空</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="total-price" v-if="cartItems.length>0">
+                        总价：¥{{ cartItems.reduce((s,i)=>s+i.price*i.count,0).toFixed(2) }}
+                    </div>
+                </div>
+
+                <div id="orderModule" style="display:none;">
+                    <h2 class="section-title">我的订单</h2>
+                    <div style="text-align:center;padding:40px;">开发中...</div>
+                </div>
+                <div id="refundModule" style="display:none;">
+                    <h2 class="section-title">退货/退款</h2>
+                    <div style="text-align:center;padding:40px;">开发中...</div>
+                </div>
+            </main>
+
+            <div class="content-tip" id="contentTip">登录后即可使用</div>
+        </div>
+    </div>
+
+    <script>
+        let vueCart = null;
+
+        // 页面加载初始化
+        window.onload = function () {
+            loadGoods();
+            initVueCart();
+            bindModalEvents();
+            bindFormEvents();
+            bindNavEvents();
+            checkLogin();
+            bindLogoutEvent();
+        };
+
+        // 1. 加载商品（从后端接口）
+        function loadGoods() {
+            fetch("http://127.0.0.1:3000/api/goods")
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("goods-container");
+                    if (data.code === 200 && data.data) {
+                        container.innerHTML = data.data.map(goods => `
+                <div class="goods-item">
+                    <div class="goods-img">
+                        <img src="${goods.img_url}" alt="${goods.name}" onerror="this.src='./img/default.jpg'">
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-name">${goods.name}</div>
+                        <div class="goods-price">¥${Number(goods.price).toFixed(2)}</div>
+                        <button class="add-cart-btn" onclick="addToCart(${goods.id})">加入购物车</button>
+                    </div>
+                </div>
+            `).join('');
+                    }
+                })
+                .catch(err => console.error("加载商品失败:", err));
+        }
+
+        // 2. 加入购物车
+        function addToCart(goodsId) {
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                alert("请先登录！");
+                document.getElementById("loginBtn").click();
+                return;
+            }
+            fetch("http://127.0.0.1:3000/api/cart/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: parseInt(userId),
+                    goods_id: goodsId
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.msg);
+                    if (data.code === 200) loadCart();
+                })
+                .catch(err => alert("网络错误，请检查后端是否启动"));
+        }
+
+        // 3. 初始化Vue购物车实例
+        function initVueCart() {
+            const { createApp } = Vue;
+            vueCart = createApp({
+                data() {
+                    return { cartItems: [] };
+                },
+                methods: {
+                    // 加载购物车数据
+                    loadCart() {
+                        const userId = localStorage.getItem("userId");
+                        if (!userId) return;
+                        fetch("http://127.0.0.1:3000/api/cart/list", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ user_id: parseInt(userId) })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.code === 200) this.cartItems = data.data;
+                            });
+                    },
+                    // 修改数量
+                    updateCount(cartId, count) {
+                        if (count < 1) return;
+                        fetch("http://127.0.0.1:3000/api/cart/update", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ cart_id: cartId, count: count })
+                        })
+                            .then(() => this.loadCart());
+                    },
+                    // 删除商品
+                    deleteItem(cartId) {
+                        if (!confirm("确定要删除这个商品吗？")) return;
+                        fetch("http://127.0.0.1:3000/api/cart/delete", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ cart_id: cartId })
+                        })
+                            .then(() => this.loadCart());
+                    }
+                }
+            }).mount("#cartApp");
+        }
+
+        // 4. 刷新购物车
+        function loadCart() {
+            if (vueCart) vueCart.loadCart();
+        }
+
+        // 5. 绑定模态框事件（登录/注册弹窗）
+        function bindModalEvents() {
+            const authModal = document.getElementById("authModal");
+            const loginBtn = document.getElementById("loginBtn");
+            const closeModal = document.getElementById("closeModal");
+            const modalTabs = document.querySelectorAll(".modal-tab");
+            const modalForms = document.querySelectorAll(".modal-form");
+
+            // 打开弹窗
+            loginBtn.addEventListener("click", () => {
+                authModal.style.display = "flex";
+                // 重置错误提示
+                document.querySelectorAll(".error-message").forEach(el => el.style.display = "none");
+            });
+
+            // 关闭弹窗
+            closeModal.addEventListener("click", () => {
+                authModal.style.display = "none";
+                // 重置表单
+                document.getElementById("loginForm").reset();
+                document.getElementById("registerForm").reset();
+            });
+
+            // 点击遮罩关闭
+            authModal.addEventListener("click", (e) => {
+                if (e.target === authModal) {
+                    authModal.style.display = "none";
+                    document.getElementById("loginForm").reset();
+                    document.getElementById("registerForm").reset();
+                }
+            });
+
+            // 切换登录/注册标签
+            modalTabs.forEach(tab => {
+                tab.addEventListener("click", function () {
+                    const tabName = this.dataset.tab;
+                    // 移除所有激活状态
+                    modalTabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                    // 切换表单显示
+                    modalForms.forEach(form => {
+                        form.classList.remove("active");
+                        if (form.id === `${tabName}Form`) {
+                            form.classList.add("active");
+                        }
+                    });
+                    // 重置对应表单
+                    document.getElementById(`${tabName}Form`).reset();
+                    document.querySelectorAll(".error-message").forEach(el => el.style.display = "none");
+                });
+            });
+        }
+
+        // 6. 绑定表单提交事件（登录/注册）
+        function bindFormEvents() {
+            // 登录表单
+            document.getElementById("loginForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                const username = document.getElementById("loginUsername").value.trim();
+                const password = document.getElementById("loginPassword").value.trim();
+                const userError = document.getElementById("loginUsernameError");
+                const pwdError = document.getElementById("loginPasswordError");
+
+                // 前端校验
+                let isValid = true;
+                if (!username) {
+                    userError.style.display = "block";
+                    isValid = false;
+                } else {
+                    userError.style.display = "none";
+                }
+                if (!password) {
+                    pwdError.style.display = "block";
+                    isValid = false;
+                } else {
+                    pwdError.style.display = "none";
+                }
+
+                if (!isValid) return;
+
+                // 调用后端登录接口
+                fetch("http://127.0.0.1:3000/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            // 登录成功，保存用户信息
+                            localStorage.setItem("userId", data.data.id);
+                            localStorage.setItem("username", data.data.username);
+                            // 关闭弹窗
+                            document.getElementById("authModal").style.display = "none";
+                            // 刷新登录状态
+                            checkLogin();
+                            alert(`欢迎回来，${data.data.username}！`);
+                        } else {
+                            alert(data.msg);
+                        }
+                    })
+                    .catch(err => alert("网络错误，请检查后端是否启动"));
+            });
+
+            // 注册表单
+            document.getElementById("registerForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                const username = document.getElementById("regUsername").value.trim();
+                const password = document.getElementById("regPassword").value.trim();
+                const confirmPwd = document.getElementById("regConfirmPassword").value.trim();
+                const userError = document.getElementById("regUsernameError");
+                const pwdError = document.getElementById("regPasswordError");
+                const confirmError = document.getElementById("regConfirmError");
+
+                // 前端校验
+                let isValid = true;
+                if (username.length < 3 || username.length > 10) {
+                    userError.style.display = "block";
+                    isValid = false;
+                } else {
+                    userError.style.display = "none";
+                }
+                if (password.length < 6) {
+                    pwdError.style.display = "block";
+                    isValid = false;
+                } else {
+                    pwdError.style.display = "none";
+                }
+                if (password !== confirmPwd) {
+                    confirmError.style.display = "block";
+                    isValid = false;
+                } else {
+                    confirmError.style.display = "none";
+                }
+
+                if (!isValid) return;
+
+                // 调用后端注册接口
+                fetch("http://127.0.0.1:3000/api/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.msg);
+                        if (data.code === 200) {
+                            // 注册成功，自动切换到登录标签
+                            document.querySelector(".modal-tab[data-tab='login']").click();
+                            document.getElementById("loginUsername").value = username;
+                        }
+                    })
+                    .catch(err => alert("网络错误，请检查后端是否启动"));
+            });
+        }
+
+        // 7. 绑定退出登录
+        function bindLogoutEvent() {
+            document.getElementById("logoutBtn").addEventListener("click", function () {
+                if (confirm("确定要退出登录吗？")) {
+                    localStorage.clear();
+                    checkLogin();
+                    // 重置导航状态
+                    document.querySelectorAll(".nav-menu a").forEach(a => a.classList.remove("active"));
+                    document.getElementById("goodsPageLink").classList.add("active");
+                    // 切换回商品页
+                    document.getElementById("goodsModule").style.display = "block";
+                    document.getElementById("cartApp").style.display = "none";
+                    alert("已成功退出登录！");
+                }
+            });
+        }
+
+        // 8. 绑定导航切换
+        function bindNavEvents() {
+            const navLinks = document.querySelectorAll(".nav-menu a");
+            navLinks.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    // 移除所有激活状态
+                    navLinks.forEach(l => l.classList.remove("active"));
+                    this.classList.add("active");
+
+                    // 隐藏所有模块
+                    document.getElementById("goodsModule").style.display = "none";
+                    document.getElementById("cartApp").style.display = "none";
+                    document.getElementById("orderModule").style.display = "none";
+                    document.getElementById("refundModule").style.display = "none";
+
+                    // 显示对应模块
+                    switch (this.id) {
+                        case "goodsPageLink":
+                            document.getElementById("goodsModule").style.display = "block";
+                            break;
+                        case "cartPageLink":
+                            document.getElementById("cartApp").style.display = "block";
+                            loadCart();
+                            break;
+                        case "orderPageLink":
+                            document.getElementById("orderModule").style.display = "block";
+                            break;
+                        case "refundPageLink":
+                            document.getElementById("refundModule").style.display = "block";
+                            break;
+                    }
+                });
+            });
+        }
+
+        // 9. 检查登录状态
+        function checkLogin() {
+            const userId = localStorage.getItem("userId");
+            const username = localStorage.getItem("username");
+            const loginBtn = document.getElementById("loginBtn");
+            const logoutBtn = document.getElementById("logoutBtn");
+            const userDisplay = document.getElementById("userDisplay");
+            const unloginTip = document.getElementById("unloginTip");
+            const userCard = document.getElementById("userCard");
+            const navMenu = document.getElementById("navMenu");
+            const contentTip = document.getElementById("contentTip");
+            const mainContent = document.getElementById("mainContent");
+            const sidebarUsername = document.getElementById("sidebarUsername");
+
+            if (userId && username) {
+                // 已登录状态
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+                userDisplay.textContent = `欢迎，${username}`;
+                unloginTip.style.display = "none";
+                userCard.style.display = "block";
+                navMenu.style.display = "block";
+                contentTip.style.display = "none";
+                mainContent.style.display = "block";
+                sidebarUsername.textContent = username;
+                // 显示商品模块
+                document.getElementById("goodsModule").style.display = "block";
+            } else {
+                // 未登录状态
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+                userDisplay.textContent = "";
+                unloginTip.style.display = "block";
+                userCard.style.display = "none";
+                navMenu.style.display = "none";
+                contentTip.style.display = "block";
+                mainContent.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>
